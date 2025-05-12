@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
-import { DocumentProcessorService } from './infraestructure/document/document-procesor.service';
-import { EmbeddingProvider } from './infraestructure/embedding/embedding.provider';
-import { InMemoryVectorService } from './infraestructure/vector/in-memory-vector.service';
+import { PdfLoaderModule } from './pdf-loader/pdf-loader.module';
+import { PdfLoaderService } from './pdf-loader/pdf-loader.service';
+import { PdfLoaderController } from './pdf-loader/pdf-loader.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [
-    DocumentProcessorService,
-    EmbeddingProvider,
-    InMemoryVectorService,
-  ],
+  imports: [ PdfLoaderModule ],
+  controllers: [PdfLoaderController],
+  providers: [ PdfLoaderService ],
 })
 export class AppModule {}

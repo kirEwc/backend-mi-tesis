@@ -6,9 +6,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Configuración de Swagger
   const config = new DocumentBuilder()
-    .setTitle('Chatbot CGES')
-    .setDescription('API para responder preguntas a partir de documentos PDF usando Qwen y Ollama')
-    .setVersion('1.0')
+    .setTitle('Chatbot SIGIES')
+    .setDescription('API para chatbot de conversación')
+    .setVersion('0.1.0')
+    .addTag('chatbot')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

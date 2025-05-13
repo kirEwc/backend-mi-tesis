@@ -85,9 +85,10 @@ export class VectorizerService {
    * Hace una búsqueda de similitud entre la consulta y los documentos vectorizados
    * @param query Texto de consulta para buscar documentos similares
    * @param topK Número de resultados más relevantes a devolver
+   * @param queryEmbeddingVector Vector de embedding opcional (si ya se ha generado)
    * @returns Array con los documentos más relevantes y su puntuación de similitud
    */
-  async searchRelevantChunks(query: string, topK = 3) {
+  async searchRelevantChunks(query: string, topK = 3, queryEmbeddingVector?: number[]) {
     this.logger.log(`Buscando documentos relevantes para la consulta: "${query}"`);
     
     // Verificar si hay documentos vectorizados
@@ -96,9 +97,16 @@ export class VectorizerService {
       return [];
     }
     
-    // Generar embedding para la consulta
-    const queryEmbedding = await this.embeddingService.generateEmbeddings(query);
-    const queryVector = queryEmbedding.data[0].embedding;
+    // Usar el vector proporcionado o generar uno nuevo
+    let queryVector: number[];
+    if (queryEmbeddingVector) {
+      this.logger.log('Usando vector de embedding proporcionado');
+      queryVector = queryEmbeddingVector;
+    } else {
+      this.logger.log('Generando nuevo embedding para la consulta');
+      const queryEmbedding = await this.embeddingService.generateEmbeddings(query);
+      queryVector = queryEmbedding.data[0].embedding;
+    }
   
     // Calcular similitud con cada documento
     const similarities = this.documentVectors.map((entry) => {

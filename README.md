@@ -2,6 +2,12 @@
 
 Este proyecto es una API desarrollada en **NestJS** que proporciona un chatbot con capacidades de respuesta natural usando un modelo LLM (`qwen:0.5b`) a través de **Ollama**. El chatbot se alimenta de una **base de conocimientos contenida en 4 archivos PDF**, procesados en memoria como embeddings, y almacena los historiales de conversación en **PostgreSQL**.
 
+## 🎯 Falta por corregir
+-  [ ] Mejorar la busqueda de contexto(similaridad) para que sea más precisa.ya que no se esta haciendo de forma correcta
+-  [ ] Mejorar (el prompt para que la ia sepa como devolver la respuesta:)la generación de respuesta para que sea más natural y no tenga que ser exacta.
+
+
+
 ## 📌 Tecnologías utilizadas
 
 - **NestJS**: Framework para el backend.

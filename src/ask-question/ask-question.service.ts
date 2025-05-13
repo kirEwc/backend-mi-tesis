@@ -3,6 +3,8 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import * as dns from 'dns';
 import { promisify } from 'util';
+import { EmbeddingService } from '../embedding/embedding.service';
+import { VectorizerService } from '../vectorizer/vectorizer.service';
 
 dotenv.config();
 
@@ -10,6 +12,11 @@ dotenv.config();
 export class AskQuestionService  {
   private readonly logger = new Logger(AskQuestionService.name);
   private readonly ollamaEndpoint = 'http://localhost:11434/api/chat';
+  
+  constructor(
+    private readonly embeddingService: EmbeddingService,
+    private readonly vectorizerService: VectorizerService,
+  ) {}
 
   // Función para verificar la conectividad con el dominio
   private async checkDomainConnectivity(domain: string): Promise<boolean> {
@@ -23,9 +30,16 @@ export class AskQuestionService  {
     }
   }
 
-  async generateAnswer(question: string, context: string): Promise<string> {
+  /**
+   * Vectoriza una pregunta, busca contexto relevante y genera una respuesta
+   * @param question Pregunta del usuario
+   * @param context Contexto opcional (si ya se tiene)
+   * @returns Respuesta generada
+   */
+  async generateAnswer(question: string, context?: string): Promise<string> {
     try {
       this.logger.log('Iniciando generación de respuesta con Ollama (modelo qwen:0.5b)');
+      this.logger.log(`Contexto: ${context}`);
       
       // Verificar que el texto no esté vacío
       if (!question || question.trim() === '') {
@@ -39,12 +53,37 @@ export class AskQuestionService  {
       if (!isConnected) {
         throw new Error(`No se puede conectar al servidor local de Ollama (${domain}). Verifique que Ollama esté en ejecución.`);
       }
+      
+      // Si no se proporciona contexto, buscar contexto relevante
+      if (!context || context.trim() === '') {
+        this.logger.log('No se proporcionó contexto. Vectorizando pregunta y buscando contexto relevante...');
+        
+        try {
+          // Vectorizar la pregunta
+          const questionEmbedding = await this.embeddingService.generateEmbeddings(question);
+          const questionVector = questionEmbedding.data[0].embedding;
+          
+          // Buscar contexto relevante usando el vector de la pregunta
+          const relevantChunks = await this.vectorizerService.searchRelevantChunks(question, 3, questionVector);
+          
+          if (relevantChunks && relevantChunks.length > 0) {
+            context = relevantChunks.map(chunk => chunk.content).join('\n\n---\n\n');
+            this.logger.log(`Contexto encontrado automáticamente (primeros 200 caracteres): ${context.substring(0, 200)}...`);
+          } else {
+            this.logger.warn('No se encontró contexto relevante. Se procederá sin contexto específico.');
+            context = 'No hay información específica disponible para esta pregunta.';
+          }
+        } catch (error) {
+          this.logger.error(`Error al buscar contexto: ${error.message}`);
+          context = 'No se pudo obtener contexto debido a un error interno.';
+        }
+      }
 
       const messages = [
         {
           role: 'system',
           content:
-            'Eres un asistente útil. Responde usando solo la información proporcionada en el contexto. Si no sabes la respuesta, di que no tienes suficiente información.',
+            'Solo vas a responder usando la información proporcionada en el contexto. Si no sabes la respuesta, di que no tienes suficiente información.',
         },
         {
           role: 'user',

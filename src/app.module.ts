@@ -8,15 +8,18 @@ import { EmbeddingController } from './embedding/embedding.controller';
 import { VectorizerModule } from './vectorizer/vectorizer.module';
 import { AskQuestionModule } from './ask-question/ask-question.module'; // <--- AÑADIR ESTA LÍNEA
 import { ChatModule } from './chat/chat.module'; // <--- AÑADIR ESTA LÍNEA
+import { InitModule } from './init/init.module';
 
 @Module({
-  imports: [ 
+  imports: [
     PdfLoaderModule,
     EmbeddingModule,
     VectorizerModule,
-    AskQuestionModule, // <--- AÑADIR ESTA LÍNEA
-    ChatModule,       // <--- AÑADIR ESTA LÍNEA
-   ],
+    AskQuestionModule,
+    ChatModule,
+    InitModule,
+  ],
+  
   controllers: [
     PdfLoaderController,
     EmbeddingController

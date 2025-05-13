@@ -1,35 +1,18 @@
 import { Module } from '@nestjs/common';
-import { PdfLoaderModule } from './pdf-loader/pdf-loader.module';
-import { PdfLoaderService } from './pdf-loader/pdf-loader.service';
-import { PdfLoaderController } from './pdf-loader/pdf-loader.controller';
-import { EmbeddingService } from './embedding/embedding.service';
-import { EmbeddingModule } from './embedding/embedding.module';
-import { EmbeddingController } from './embedding/embedding.controller';
-import { VectorizerModule } from './vectorizer/vectorizer.module';
-import { AskQuestionModule } from './ask-question/ask-question.module'; // <--- AÑADIR ESTA LÍNEA
-import { ChatModule } from './chat/chat.module'; // <--- AÑADIR ESTA LÍNEA
-import { InitModule } from './init/init.module';
+import { RespuestaController } from './respuesta/respuesta.controller';
+import { RespuestaModule } from './respuesta/respuesta.module';
+import { RespuestaService } from './respuesta/respuesta.service';
 
 @Module({
   imports: [
-    PdfLoaderModule,
-    EmbeddingModule,
-    VectorizerModule,
-    AskQuestionModule,
-    ChatModule,
-    InitModule,
+    RespuestaModule
   ],
   
   controllers: [
-    PdfLoaderController,
-    EmbeddingController
-    // ChatController está en ChatModule
-    // VectorizerController está en VectorizerModule
+    RespuestaController
   ],
   providers: [ 
-    PdfLoaderService, // Estos son servicios que AppModule podría estar proveyendo directamente o re-exportando.
-    EmbeddingService  // Si son provistos por sus propios módulos y esos módulos son importados, no necesitan estar aquí.
-                      // Por ahora, los mantendré como estaban en tu archivo original.
+    RespuestaService
    ],
 })
 export class AppModule {}

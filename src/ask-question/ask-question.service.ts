@@ -5,6 +5,7 @@ import * as dns from 'dns';
 import { promisify } from 'util';
 import { EmbeddingService } from '../embedding/embedding.service';
 import { VectorizerService } from '../vectorizer/vectorizer.service';
+import { PROMPT } from './prompt';
 
 dotenv.config();
 
@@ -47,11 +48,15 @@ export class AskQuestionService  {
       }
       
       // Verificar conectividad con el servidor local de Ollama
-      const domain = 'localhost';
-      const isConnected = await this.checkDomainConnectivity(domain);
-      
-      if (!isConnected) {
-        throw new Error(`No se puede conectar al servidor local de Ollama (${domain}). Verifique que Ollama esté en ejecución.`);
+      let a = true;
+      if(a){
+        const domain = 'localhost';
+        const isConnected = await this.checkDomainConnectivity(domain);
+        
+        if (!isConnected) {
+          throw new Error(`No se puede conectar al servidor local de Ollama (${domain}). Verifique que Ollama esté en ejecución.`);
+        }
+
       }
       
       // Si no se proporciona contexto, buscar contexto relevante
@@ -82,8 +87,7 @@ export class AskQuestionService  {
       const messages = [
         {
           role: 'system',
-          content:
-            'Solo vas a responder usando la información proporcionada en el contexto. Si no sabes la respuesta, di que no tienes suficiente información.',
+          content: PROMPT,
         },
         {
           role: 'user',
@@ -107,7 +111,7 @@ export class AskQuestionService  {
         );
 
         // Verificar que la respuesta contiene datos
-        if (!response.data || !response.data.message || typeof response.data.message.content !== 'string') {
+        if (!response.data.message || typeof response.data.message.content !== 'string') {
           throw new Error('La API de Ollama no devolvió una respuesta válida');
         }
         

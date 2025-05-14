@@ -4,6 +4,8 @@ import { RespuestaService } from './respuesta.service';
 
 @Module({
   controllers: [RespuestaController],
-  providers: [RespuestaService]
+  providers: [RespuestaService],
+  exports: [RespuestaService],
+
 })
 export class RespuestaModule {}

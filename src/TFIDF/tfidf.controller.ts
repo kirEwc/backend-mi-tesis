@@ -1,6 +1,6 @@
 
 // tfidf-retriever.controller.ts
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { TfidfRetrieverService } from './tfidf.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 

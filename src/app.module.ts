@@ -4,18 +4,24 @@ import { RespuestaModule } from './respuesta/respuesta.module';
 import { RespuestaService } from './respuesta/respuesta.service';
 import { TfidfRetrieverModule } from './TFIDF/tfidf.module';
 import { InitModule } from './init/init.module';
+import { AskQuestionModule } from './usecases/ask-question/ask-question.module';
+import { AskQuestionController } from './usecases/ask-question/ask-question.controller';
+import { AskQuestionService } from './usecases/ask-question/ask-question.service';
 
 @Module({
   imports: [
     RespuestaModule,
     TfidfRetrieverModule,
+    AskQuestionModule,
     InitModule
   ],
   
   controllers: [
-    RespuestaController
+    RespuestaController,
+    AskQuestionController,
   ],
   providers: [ 
+    AskQuestionService,
     RespuestaService
    ],
 })

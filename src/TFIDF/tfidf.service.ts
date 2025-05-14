@@ -128,7 +128,7 @@ export class TfidfRetrieverService {
   /**
    * Vectoriza la consulta y busca los vecinos más cercanos
    */
-  query(query: string, k: number = 3): Array<{ text: string; similarity: number }> {
+  query(query: string, k: number = 5): Array<{ text: string; similarity: number }> {
     // Vectorizar la consulta
     const tempTfidf = new natural.TfIdf();
     tempTfidf.addDocument(query);

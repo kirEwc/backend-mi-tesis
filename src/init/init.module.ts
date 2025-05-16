@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
 import { InitService } from './init.service';
-import { VectorizerModule } from '../vectorizer/vectorizer.module';
+import { TfidfRetrieverModule } from '../TFIDF/tfidf.module';
 
 @Module({
-  imports: [VectorizerModule],
-  providers: [InitService],
-  exports: [InitService]
+  imports: [
+    TfidfRetrieverModule
+  ],
+  providers: [
+    InitService
+  ],
+  exports: [
+    InitService
+  ]
 })
-export class InitModule {}
+export class InitModule {};

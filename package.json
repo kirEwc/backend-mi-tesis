@@ -31,6 +31,7 @@
     "class-validator": "^0.14.2",
     "dotenv": "^16.5.0",
     "langchain": "^0.3.24",
+    "natural": "^8.0.1",
     "openai": "^4.98.0",
     "pdf-parse": "^1.1.1",
     "reflect-metadata": "^0.2.0",

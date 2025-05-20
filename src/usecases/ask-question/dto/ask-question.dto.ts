@@ -10,4 +10,6 @@ export class AskQuestionDto {
   @IsString()
   @IsNotEmpty()
   pregunta: string;
+
+  
 }

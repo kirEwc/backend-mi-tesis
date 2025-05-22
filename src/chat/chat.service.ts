@@ -4,12 +4,16 @@ import { User } from "src/entity/user.entity";
 import { Repository } from "typeorm";
 import { MessageDto } from "./dto/message.dto";
 import { Message } from "src/entity/message.entity";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class ChatService{
     constructor(
+        @InjectRepository(Chat)
         private chatRepository : Repository<Chat>,
+        @InjectRepository(User)
         private userRepository : Repository<User>,
+        @InjectRepository(Message)
         private messageRepository: Repository<Message>
     )
     {}

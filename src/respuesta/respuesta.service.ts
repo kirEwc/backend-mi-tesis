@@ -12,7 +12,7 @@ export class RespuestaService {
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer " + process.env.api_key,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({

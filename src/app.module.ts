@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { RespuestaController } from './respuesta/respuesta.controller';
 import { RespuestaModule } from './respuesta/respuesta.module';
 import { RespuestaService } from './respuesta/respuesta.service';
@@ -10,6 +11,7 @@ import { AskQuestionService } from './usecases/ask-question/ask-question.service
 
 @Module({
   imports: [
+    HttpModule,
     RespuestaModule,
     TfidfRetrieverModule,
     AskQuestionModule,

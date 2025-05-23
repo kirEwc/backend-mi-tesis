@@ -1,0 +1,59 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30     # Reduced duration for initial testing
+      arrivalRate: 5    # Reduced rate for initial testing
+      maxVusers: 20     # Reduced max users for initial testing
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+  http:
+    timeout: 30000
+    pool: 5
+    rejectUnauthorized: false
+  ensure:
+    maxErrorRate: 10  # Increased error tolerance for testing
+  variables:
+    baseUrl: "http://localhost:3000"
+    questions: 
+      - "¿Qué es la inteligencia artificial?"
+      - "Explícame cómo funciona el machine learning"
+      - "¿Cuáles son los tipos de IA?"
+      - "Diferencia entre IA y machine learning"
+      - "Aplicaciones de la IA en la actualidad"
+
+scenarios:
+  - name: Health Check
+    flow:
+      - get:
+          url: "/"
+          capture:
+            - json: "$.message"
+              as: "healthCheck"
+          ensure:
+            - statusCode: [200, 404]  # Accept either success or not found
+
+  - name: Ask Question Test
+    flow:
+      - post:
+          url: "/ask-question"
+          json:
+            pregunta: "{{ $randomElement($.questions) }}"
+          capture:
+            - json: "$.respuesta"
+              as: "respuesta"
+          ensure:
+            - statusCode: [200, 201]  # Accept both 200 and 201
+            - hasProperty: "respuesta"
+      - think: 1  # Added small delay between requests
+
+  - name: Invalid Question Test
+    flow:
+      - post:
+          url: "/ask-question"
+          json:
+            pregunta: "{{ $randomString(100) }}"
+          ensure:
+            - statusCode: [200, 201, 400, 404, 500]  # Accept various status codes for now
+      - think: 0.5

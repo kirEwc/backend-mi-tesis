@@ -10,7 +10,7 @@ describe('AskQuestion Integration Tests', () => {
 
   beforeAll(async () => {
     try {
-      logger.log('Starting test setup...');
+      // logger.log('Starting test setup...');
       const module = await Test.createTestingModule({
         imports: [AppModule],
       }).compile();
@@ -36,9 +36,9 @@ describe('AskQuestion Integration Tests', () => {
         }),
       );
       
-      logger.log('Initializing application...');
+      // logger.log('Initializing application...');
       await app.init();
-      logger.log('Application initialized');
+      // logger.log('Application initialized');
     } catch (error) {
       logger.error('Error during test setup', error);
       throw error;
@@ -51,6 +51,8 @@ describe('AskQuestion Integration Tests', () => {
 
   describe('POST /ask-question', () => {
     it('should return 200 and a response for a valid question', async () => {
+      // Aumentar el timeout para dar tiempo a la respuesta del servicio de IA
+      jest.setTimeout(10000); // 10 segundos
       // Skip this test if the application failed to initialize
       if (!app) {
         throw new Error('Application failed to initialize');
@@ -58,7 +60,7 @@ describe('AskQuestion Integration Tests', () => {
       const testQuestion = '¿Qué es la inteligencia artificial?';
       const server = app.getHttpServer();
       
-      logger.log(`Sending request to /ask-question with question: ${testQuestion}`);
+      // logger.log(`Sending request to /ask-question with question: ${testQuestion}`);
       
       try {
         const response = await request(server)
@@ -66,11 +68,11 @@ describe('AskQuestion Integration Tests', () => {
           .set('Accept', 'application/json')
           .send({ pregunta: testQuestion });
         
-        logger.log('Response received', {
-          status: response.status,
-          body: response.body,
-          headers: response.headers
-        });
+        // logger.log('Response received', {
+        //   status: response.status,
+        //   body: response.body,
+        //   headers: response.headers
+        // });
         
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('respuesta');

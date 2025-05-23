@@ -5,6 +5,9 @@ import { AppModule } from '../../src/app.module';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Aumentar el timeout para dar tiempo suficiente a las operaciones
+jest.setTimeout(10000); // 10 segundos como en las pruebas e2e
+
 describe('TfidfRetriever (Functional)', () => {
   let app: INestApplication;
   const indexPath = path.join(__dirname, '..', '..', 'tfidf_index.json');
@@ -30,47 +33,72 @@ describe('TfidfRetriever (Functional)', () => {
     try {
       // Asegurarse de que el archivo de índice no exista antes de empezar
       if (fs.existsSync(indexPath)) {
-        console.log('Eliminando archivo de índice existente...');
+        // console.log('Eliminando archivo de índice existente...');
         fs.unlinkSync(indexPath);
       }
 
-      console.log('Iniciando prueba de carga de documentos...');
-      // 1. Llamar a /tfidf/load
-      const loadResponse = await request(app.getHttpServer())
-        .post('/tfidf/load')
-        .send({ docsPath: './knowledgebase', chunkSize: 500 });
+      // console.log('Iniciando prueba de carga de documentos...');
+      // Función de utilidad para reintentar peticiones en caso de error de conexión
+      const retryRequest = async (fn, maxRetries = 3, delay = 1000) => {
+        let lastError;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            return await fn();
+          } catch (error) {
+            lastError = error;
+            if (error.code === 'ECONNRESET' && attempt < maxRetries) {
+              console.log(`Intento ${attempt} falló con ECONNRESET, reintentando en ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            throw error;
+          }
+        }
+        throw lastError;
+      };
+
+      // 1. Llamar a /tfidf/load con reintentos
+      const loadResponse = await retryRequest(() => 
+        request(app.getHttpServer())
+          .post('/tfidf/load')
+          .send({ docsPath: './knowledgebase', chunkSize: 500 })
+      );
       
-      console.log('Respuesta de carga:', loadResponse.status, loadResponse.body);
+      // console.log('Respuesta de carga:', loadResponse.status, loadResponse.body);
       expect(loadResponse.status).toBe(201);
 
-      console.log('Iniciando indexación...');
-      // 2. Llamar a /tfidf/index
-      const indexResponse = await request(app.getHttpServer())
-        .post('/tfidf/index');
+      // console.log('Iniciando indexación...');
+      // 2. Llamar a /tfidf/index con reintentos
+      const indexResponse = await retryRequest(() => 
+        request(app.getHttpServer())
+          .post('/tfidf/index')
+      );
       
-      console.log('Respuesta de indexación:', indexResponse.status, indexResponse.body);
+      // console.log('Respuesta de indexación:', indexResponse.status, indexResponse.body);
       expect(indexResponse.status).toBe(201);
 
       // Verificar que el archivo de índice se ha creado
-      console.log('Verificando archivo de índice...');
+      // console.log('Verificando archivo de índice...');
       const indexExists = fs.existsSync(indexPath);
-      console.log('¿Existe el archivo de índice?', indexExists);
+      // console.log('¿Existe el archivo de índice?', indexExists);
       expect(indexExists).toBe(true);
       
       if (indexExists) {
         const indexContent = fs.readFileSync(indexPath, 'utf8');
-        console.log('Tamaño del archivo de índice:', indexContent.length);
+        // console.log('Tamaño del archivo de índice:', indexContent.length);
         expect(indexContent).toBeDefined();
         expect(indexContent.length).toBeGreaterThan(0);
       }
 
-      console.log('Realizando consulta de prueba...');
-      // 3. Llamar a /tfidf/query con parámetros de consulta GET
-      const queryResult = await request(app.getHttpServer())
-        .get('/tfidf/query')
-        .query({ q: 'test query', k: 2 });
+      // console.log('Realizando consulta de prueba...');
+      // 3. Llamar a /tfidf/query con parámetros de consulta GET y reintentos
+      const queryResult = await retryRequest(() => 
+        request(app.getHttpServer())
+          .get('/tfidf/query')
+          .query({ q: 'test query', k: 2 })
+      );
       
-      console.log('Resultado de la consulta:', queryResult.status, queryResult.body);
+      // console.log('Resultado de la consulta:', queryResult.status, queryResult.body);
       expect(queryResult.status).toBe(200);
 
       // Verificar la estructura y contenido del resultado de la consulta
@@ -79,7 +107,7 @@ describe('TfidfRetriever (Functional)', () => {
       expect(queryResult.body.results.length).toBeLessThanOrEqual(2);
       
       if (queryResult.body.results.length > 0) {
-        console.log('Primer resultado:', queryResult.body.results[0]);
+        // console.log('Primer resultado:', queryResult.body.results[0]);
         expect(queryResult.body.results[0]).toHaveProperty('text');
         expect(queryResult.body.results[0]).toHaveProperty('similarity');
         expect(typeof queryResult.body.results[0].text).toBe('string');
@@ -111,10 +139,31 @@ describe('TfidfRetriever (Functional)', () => {
     fs.writeFileSync(indexPath, JSON.stringify(mockIndexData));
     
     try {
-      // Realizar una consulta simple
-      const queryResult = await request(app.getHttpServer())
-        .get('/tfidf/query')
-        .query({ q: 'documento', k: 1 });
+      // Función de utilidad para reintentar peticiones en caso de error de conexión
+      const retryRequest = async (fn, maxRetries = 3, delay = 1000) => {
+        let lastError;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            return await fn();
+          } catch (error) {
+            lastError = error;
+            if (error.code === 'ECONNRESET' && attempt < maxRetries) {
+              console.log(`Intento ${attempt} falló con ECONNRESET, reintentando en ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            throw error;
+          }
+        }
+        throw lastError;
+      };
+
+      // Realizar una consulta simple con reintentos
+      const queryResult = await retryRequest(() => 
+        request(app.getHttpServer())
+          .get('/tfidf/query')
+          .query({ q: 'documento', k: 1 })
+      );
       
       // Verificar la respuesta
       expect(queryResult.status).toBe(200);

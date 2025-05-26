@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TfidfRetrieverService } from 'src/TFIDF/tfidf.service';
-import { RespuestaService } from 'src/respuesta/respuesta.service';
+import { TfidfRetrieverService } from '../../TFIDF/tfidf.service';
+import { RespuestaService } from '../../respuesta/respuesta.service';
 
 @Injectable()
 export class AskQuestionService {

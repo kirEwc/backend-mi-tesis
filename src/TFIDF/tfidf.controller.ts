@@ -15,7 +15,7 @@ export class TfidfRetrieverController {
   @ApiResponse({ status: 200, description: 'Documentos cargados correctamente' })
   @ApiResponse({ status: 500, description: 'Error al cargar documentos' })
   async loadDocuments(@Body() body: { chunkSize?: number }) {
-    const chunkSize = body.chunkSize || 500;
+    const chunkSize = body.chunkSize || 1000;
     await this.tfidfService.loadAndSplit(chunkSize);
     return { message: 'Documentos cargados correctamente' };
   }

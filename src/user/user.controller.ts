@@ -4,8 +4,8 @@ import { UserDto } from "./dto/user.dto";
 import { Response } from "express";
 import { UserService } from "./user.service";
 
-ApiTags('user')
-Controller('user')
+@ApiTags('user')
+@Controller('user')
 export class UserController{
     constructor(
         private userService : UserService

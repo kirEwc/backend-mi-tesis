@@ -1,6 +1,6 @@
 // src/ask-question/ask-question.controller.ts
 import { Controller, Post, Body, Res, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBadRequestResponse, ApiParam } from '@nestjs/swagger';
 import { AskQuestionService } from './ask-question.service';
 import { AskQuestionDto } from './dto/ask-question.dto';
 import { Response } from 'express';
@@ -16,6 +16,7 @@ export class AskQuestionController {
 
   @Post("/:idChat")
   @ApiOperation({ summary: 'Pregunta algo y recibe una respuesta generada por IA' })
+  @ApiParam({ name: 'idChat', type: 'number', description: 'ID del chat donde se guardará la pregunta y respuesta' })
   @ApiResponse({
     status: 200,
     description: 'Respuesta generada exitosamente',
@@ -26,7 +27,7 @@ export class AskQuestionController {
     },
   })
   @ApiBadRequestResponse({ description: 'La pregunta es requerida' })
-  async hacerPregunta(@Body() dto: AskQuestionDto ,@Param() idChat: number , @Res() res: Response) {
+  async hacerPregunta(@Body() dto: AskQuestionDto ,@Param('idChat') idChat: number , @Res() res: Response) {
     const { pregunta } = dto;
     const respuesta = await this.askQuestionService.procesarPregunta(pregunta);
     const messageDto : MessageDto = {

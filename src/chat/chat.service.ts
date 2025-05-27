@@ -19,11 +19,12 @@ export class ChatService{
     {}
     async createNewChat(userId: number) :Promise<Chat | null>{
         const User = await this.userRepository.findOne({where: {Userid : userId}});
-        if(User){
+        if(User === null){
             return null;
         }
         const newChat = this.chatRepository.create({
-            user : User
+            user : User,
+            Create_At: new Date() // Añadir la fecha actual
         });
         await this.chatRepository.save(newChat);
         return newChat;
@@ -31,14 +32,14 @@ export class ChatService{
     async getAllChats(userId: number) : Promise<Chat[]>{
         const chats = await this.chatRepository.find({    
             where : {user : {Userid : userId}},
-            relations: ['User']
+            relations: ['user'] // Cambiado de 'User' a 'user'
         });
         return chats;
     }
     async getChatById(chatId : number): Promise<Chat | null>{
         const chat = await this.chatRepository.findOne({
             where: {Chat_id: chatId},
-            relations: ['Message']
+            relations: ['message'] // Cambiado de 'Message' a 'message'
         })
         if(!chat){
             return null;
@@ -62,5 +63,6 @@ export class ChatService{
         if(chat){
             this.chatRepository.delete(chat);
         }
+        
     }
 }

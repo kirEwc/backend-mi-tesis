@@ -7,6 +7,12 @@ import { InitModule } from './init/init.module';
 import { AskQuestionModule } from './usecases/ask-question/ask-question.module';
 import { dataSource } from './database/datasource';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatService } from './chat/chat.service';
+import { UserService } from './user/user.service';
+import { ChatController } from './chat/chat.controller';
+import { UserController } from './user/user.controller';
+import { ChatModule } from './chat/chat.module';
+import { UserModule } from './user/user.module';
 
 
 @Module({
@@ -16,8 +22,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TfidfRetrieverModule,
     AskQuestionModule,
     InitModule,
-    
+    ChatModule,
+    UserModule  // Añadir esta línea
   ],
-
+  controllers: [
+    // Eliminar UserController de aquí
+  ],
+  providers: [
+    // Eliminar UserService de aquí
+  ]
 })
 export class AppModule {}

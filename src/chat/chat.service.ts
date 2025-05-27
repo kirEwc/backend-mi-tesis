@@ -54,7 +54,11 @@ export class ChatService{
         if(!chat){
             return null;
         }
-        const newMessage = this.messageRepository.create(messageDto);
+        const newMessage = this.messageRepository.create({
+            ...messageDto,
+            create_At: new Date(),
+            chat: chat
+        });
         await this.messageRepository.save(newMessage);
         return newMessage;
     }

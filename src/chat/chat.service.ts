@@ -62,11 +62,13 @@ export class ChatService{
         await this.messageRepository.save(newMessage);
         return newMessage;
     }
-    async DeleteChatById(idChat: number){
+    async DeleteChatById(idChat: number) : Promise<Chat | null>{
         const chat = await this.getChatById(idChat);
+        console.log(chat);
         if(chat){
-            this.chatRepository.delete(chat);
+            this.chatRepository.delete(idChat);
+            return chat;
         }
-        
+        return null;
     }
 }

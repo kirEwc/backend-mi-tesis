@@ -34,7 +34,8 @@ export class ChatController{
     @Get(`GetMessagesByChat/:idChat`)
     @ApiOperation({summary: "Obtener todos los mensajes de un chat"})
     async GetAllMessageByChat(@Param('idChat') idChat: number , @Res() Res: Response){
-        const chat = this.chatService.getChatById(idChat);
+        const chat = await this.chatService.getChatById(idChat);
+        console.log(chat);
         if(!chat){
             return Res.status(404).json({
                 message: `El chat con id ${idChat} no se encuentra `
@@ -47,7 +48,12 @@ export class ChatController{
     @Delete("/:idChat")
     @ApiOperation({summary: "Eliminar un chat por su identificador"})
     async DeleteChat(@Param('idChat') idChat: number , @Res() res: Response){
-        await this.chatService.DeleteChatById(idChat);
+        const chat = await this.chatService.DeleteChatById(idChat);
+        if(!chat){
+            return res.status(404).json({
+                message: `El chat con id ${idChat} no se encuentra `
+            })
+        }
         return res.status(200).json({
             message: "El chat y los mensajes asociados a el han sido eliminados "
         })
